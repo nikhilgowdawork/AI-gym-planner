@@ -47,7 +47,8 @@ if st.session_state["page"] == 1:
 
 #page 2
 elif st.session_state["page"] == 2:
-     st.session_state["age"] = st.number_input("AGE", min_value=0, max_value=100, value=None ,step=1)
+     st.session_state["age"] = st.number_input("AGE", min_value=0, max_value=100, value=1,step=1)
+     st.caption("Age must be above 15 to get Personlized Plans. ")
      st.session_state["weight"] = st.number_input("WEIGHT (kg)",min_value=None, max_value=300,value=None, step=1)
      st.session_state["height"] = st.number_input("HEIGHT (cm)", min_value=None, max_value=250,value=None, step=1)
      st.session_state["Goal"] = st.selectbox("Goal",
@@ -66,11 +67,14 @@ elif st.session_state["page"] == 2:
                                    [None,"male","female"],
                                    format_func=lambda x :"gender" if x is None else x
                                    )
+     
 
 if st.session_state["page"] == 2:     
  if  st.button("back"):
      st.session_state["page"] -= 1
      st.rerun()
+
+
 
 #store user data in one variable 
 user_data=f"""
@@ -84,14 +88,36 @@ Activity Level: {st.session_state["daily_activity_level"]}
 Additional Details: {st.session_state["additional_detail"]}
 """
 
-    
-     
 #button to submit the data and show back to user
 if st.session_state["page"] == 2:
+
+    if  st.session_state["age"] < 15:
+      st.warning("Structured gym training is not recommended for user with age > 15 years. ")
+      st.stop()
+    
+    required_feilds =[
+         st.session_state["age"],
+          st.session_state["weight"],
+          st.session_state["height"],
+          st.session_state["Goal"],
+          st.session_state["diet_type"],
+          st.session_state["exercise_place"],
+          st.session_state["daily_activity_level"],
+          st.session_state["gender"]
+         ]
+         
+    if any (feild is None for feild in required_feilds):
+         st.warning("Please complete all previous steps before generating the plan.")
+
      
-    if  st.button("submit",key="submit"):
-     st.session_state["page"] = 3
-     st.rerun()
+    else:
+        if st.button("submit",key="submit"):
+         st.session_state["page"] = 3
+         st.rerun()
+    
+    
+
+    
      
 
 #page 3
@@ -110,10 +136,10 @@ if st.session_state["page"] == 3:
  if  st.button("submit",key="submit_page3"):
      st.session_state["page"] = 4
      st.rerun()
- if st.session_state["age"] < 15:
-     st.warning("Structured gym training is not recommended for young users without supervision.")
-     st.stop()
- 
+     
+
+
+
      
 
 #page 4 - AI Analysis and Plans
@@ -167,22 +193,7 @@ generation_config={
 }
 if st.session_state["page"] == 4:
      
-     required_feilds =[
-         st.session_state["age"],
-          st.session_state["weight"],
-          st.session_state["height"],
-          st.session_state["Goal"],
-          st.session_state["diet_type"],
-          st.session_state["exercise_place"],
-          st.session_state["daily_activity_level"],
-          st.session_state["gender"]
-         ]
-         
-     if any (feild is None for feild in required_feilds):
-         st.error("Please complete all previous steps before generating the plan.")    
-     
-     else:
-          if st.session_state["your_personalized_plan"] is None:
+     if st.session_state["your_personalized_plan"] is None:
             if st.button("Generate Plans", key="generate_plans"):
              with st.spinner("AI is creating your personalized plan..."):
                try:
