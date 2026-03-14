@@ -1,25 +1,66 @@
-from reportlab.platypus import SimpleDocTemplate,paragraph,Spacer
-
+from reportlab.platypus import SimpleDocTemplate,paragraph,Spacer,Table
 from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
+from reportlab.lib.units import inch
 import streamlit as st
 
 content = st.session_state["your_personalized_plan"] 
 
 
-def create_pdf(content):
+def create_pdf(exercise_data, diet_data, supplements, tips):
+
     buffer = BytesIO()
     styles = getSampleStyleSheet()
 
-    doc = SimpleDocTemplate(buffer)
+    doc = SimpleDocTemplate(buffer, pagesize=(8.5*inch, 11*inch))
 
-    Story = []
+    story = []
 
-    for line in content.split("\n"):
-        Story.append(paragraph(line,styles["Normal"]))
-        Story.append(Spacer(1,10))
+    # TITLE
+    story.append(paragraph("AI Personalized Fitness Plan", styles["Title"]))
+    story.append(Spacer(1,20))
 
-        doc.build(Story)
 
-        buffer.seek(0)
-        return buffer
+
+    # EXERCISE TABLE
+    story.append(paragraph("7-Day Exercise Plan", styles["Heading2"]))
+    story.append(Spacer(1,10))
+
+    exercise_table = Table(exercise_data)
+    story.append(exercise_table)
+
+    story.append(Spacer(1,20))
+
+
+    # DIET TABLE
+    story.append(paragraph("7-Day Diet Plan", styles["Heading2"]))
+    story.append(Spacer(1,10))
+
+    diet_table = Table(diet_data)
+    story.append(diet_table)
+
+    story.append(Spacer(1,20))
+
+
+    # SUPPLEMENTS
+    story.append(paragraph("Supplements (Optional)", styles["Heading2"]))
+    story.append(Spacer(1,10))
+
+    for s in supplements:
+        story.append(paragraph(f"• {s}", styles["Normal"]))
+
+    story.append(Spacer(1,20))
+
+
+    # HEALTH TIPS
+    story.append(paragraph("Practical Health Tips", styles["Heading2"]))
+    story.append(Spacer(1,10))
+
+    for t in tips:
+        story.append(paragraph(f"• {t}", styles["Normal"]))
+
+
+    doc.build(story)
+
+    buffer.seek(0)
+    return buffer

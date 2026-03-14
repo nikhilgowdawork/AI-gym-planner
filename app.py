@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 from services.groq_service import generate_plan
 from services.fitness_service import calculate_metrics
 from services.prompt_service import build_response
+from reportlab.platypus import SimpleDocTemplate,paragraph,Spacer
+
+from reportlab.lib.styles import getSampleStyleSheet
+from io import BytesIO
 
 load_dotenv()
 

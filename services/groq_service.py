@@ -1,6 +1,7 @@
 import requests #lets python senf HTTP requests (talk to APIs)
 import os #lets python to read environment variables
 
+
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions" 
 
 def  generate_plan(system_prompt : str) -> str:
