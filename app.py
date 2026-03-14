@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 from services.groq_service import generate_plan
 from services.fitness_service import calculate_metrics
 from services.prompt_service import build_response
-from reportlab.platypus import SimpleDocTemplate,paragraph,Spacer
+import json
+import pandas as pd 
+from services.pdf_service import create_pdf
 
-from reportlab.lib.styles import getSampleStyleSheet
-from io import BytesIO
 
 load_dotenv()
 
@@ -202,7 +202,9 @@ if st.session_state["page"] == 4:
              with st.spinner("AI is creating your personalized plan..."):
                try:
                    generate_text = generate_plan(system_prompt)
-                   st.session_state["your_personalized_plan"] = generate_text
+                   plan_data = json.loads(generate_text)
+
+                   st.session_state["your_personalized_plan"] = plan_data
                    st.write("plan generated successfully with AI!")
                except Exception as e:
                    st.error("something went wrong whike genrating your plan . plese try agian later.")
@@ -212,33 +214,68 @@ if st.session_state["page"] == 4:
      # Display the plan if generated
      if st.session_state["your_personalized_plan"] :
           st.divider()
-          st.markdown(st.session_state["your_personalized_plan"])
+          plan = st.session_state["your_personlized_plan"]
+
+          intro = plan["introduction"]
+          exercise_data = plan["exercise_plan"]
+          diet_data = plan["diet_plan"]
+          supplements = plan["supplements"]
+          tips = plan["health_tips"]
+          closing = plan["closing_message"]
+
+          st.write(intro)
+
+          st.subheader("7-Days Exercise Plan")
+          exercise_df = pd.dataframe(exercise_data)
+          st.table(exercise_df)
+
+          st.subheader("7-Day Diet Plan")
+          diet_df = pd.DataFrame(diet_data)
+          st.table(diet_df)
+
+          st.subheader("Supplements")
+          for s in supplements:
+               st.write("•", s)
+
+          st.subheader("Health Tips")
+          for t in tips:
+              st.write("•",t)
+
+          st.write(closing)
+
+          pdf_file = create_pdf(exercise_data, diet_data, supplements, tips)
+
 
      if st.session_state["your_personalized_plan"] != None:
          if st.button("Regenerate Plan"):
           with st.spinner("regenerating..."):
-           st.session_state["your_personalized_plan"] = generate_plan()
+            try:
+                   generate_text = generate_plan(system_prompt)
+                   plan_data = json.loads(generate_text)
 
+                   st.session_state["your_personalized_plan"] = plan_data
+                   
+            except Exception as e:
+                   st.error("Failed to regenrate the Plan.")
+                   print("ERROR", e)
+                   
      # Navigation buttons
-     col1, col2 = st.columns(2)
+     col1, col2, col3 = st.columns(3)
      with col1:
           if st.button("Back", key="back_page4"):
                st.session_state["page"] = 3
                st.rerun()
      with col2:
+         if st.session_state["your_personalized_plan"]:
+          st.download_button(
+          "Download Plan as PDF",
+          pdf_file,
+          "AI_Fitness_Plan.pdf",
+          "application/pdf"
+     )
+         
+     with col3:
           if st.button("Start Over", key="start_over"):
-               st.session_state["page"] = 1
-               st.session_state["age"] = None
-               st.session_state["weight"] = None
-               st.session_state["height"] = None
-               st.session_state["Goal"] = None
-               st.session_state["diet_type"] = None
-               st.session_state["additional_detail"] = None
-               st.session_state["exercise_place"] = None
-               st.session_state["your_personalized_plan"] = None
-               st.session_state["BMR"] = None
-               st.session_state["TDEE"] = None
-               st.session_state["protein_intake"] = None
-               st.session_state["daily_activity_level"] = None
-               st.session_state["gender"]=None
+               st.session_state.clear()
+               st.sessiom_state["page"] = 1
                st.rerun()
