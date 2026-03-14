@@ -95,37 +95,43 @@ Do NOT include markdown.
 Do NOT include tables.
 Do NOT include headings.
 Do NOT include explanations outside the JSON.
-
 Use this exact JSON structure:
 
-{
+{{
 "introduction": "",
 
-"exercise_plan":[
-{"day":"","exercise":"","sets":"","reps":"","rest":""}
+"exercise_plan": [
+{{
+"day": "",
+"exercise": "",
+"sets": "",
+"reps": "",
+"rest": ""
+}}
 ],
 
-"diet_plan":[
-{
-"day":"",
-"breakfast":"",
-"lunch":"",
-"dinner":"",
-"snacks":"",
-"calories":"",
-"protein":""
-}
+"diet_plan": [
+{{
+"day": "",
+"breakfast": "",
+"lunch": "",
+"dinner": "",
+"snacks": "",
+"calories": "",
+"protein": ""
+}}
 ],
 
-"supplements":[
+"supplements": [
 ""
 ],
 
-"health_tips":[
+"health_tips": [
 ""
 ],
 
-"closing_message":""
-}
+"closing_message": ""
+}}
+
 
 """

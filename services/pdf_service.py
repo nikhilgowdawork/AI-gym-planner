@@ -1,10 +1,9 @@
-from reportlab.platypus import SimpleDocTemplate,paragraph,Spacer,Table
+from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Table
+
 from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
 from reportlab.lib.units import inch
 import streamlit as st
-
-content = st.session_state["your_personalized_plan"] 
 
 
 def create_pdf(exercise_data, diet_data, supplements, tips):
@@ -17,47 +16,70 @@ def create_pdf(exercise_data, diet_data, supplements, tips):
     story = []
 
     # TITLE
-    story.append(paragraph("AI Personalized Fitness Plan", styles["Title"]))
+    story.append(Paragraph("AI Personalized Fitness Plan", styles["Title"]))
     story.append(Spacer(1,20))
 
 
 
     # EXERCISE TABLE
-    story.append(paragraph("7-Day Exercise Plan", styles["Heading2"]))
+    story.append(Paragraph("7-Day Exercise Plan", styles["Heading2"]))
     story.append(Spacer(1,10))
 
-    exercise_table = Table(exercise_data)
-    story.append(exercise_table)
+    exercise_table = [["Day","Exercise","Sets","Reps","Rest"]]
 
-    story.append(Spacer(1,20))
+    for row in exercise_data:
+        exercise_table.append([
+        row["day"],
+        row["exercise"],
+        row["sets"],
+        row["reps"],
+        row["rest"]
+    ])
+
+    table = Table(exercise_table)
+    story.append(table)
 
 
     # DIET TABLE
-    story.append(paragraph("7-Day Diet Plan", styles["Heading2"]))
-    story.append(Spacer(1,10))
+    story.append(Paragraph("7-Day Diet Plan", styles["Heading2"]))
+    
 
-    diet_table = Table(diet_data)
-    story.append(diet_table)
+    diet_table = [
+    ["Day", "Breakfast", "Lunch", "Dinner", "Snacks", "Calories", "Protein"]
+]
 
-    story.append(Spacer(1,20))
+    for row in diet_data:
+        diet_table.append([
+        row["day"],
+        row["breakfast"],
+        row["lunch"],
+        row["dinner"],
+        row["snacks"],
+        row["calories"],
+        row["protein"]
+    ])
+
+    diet_table_obj = Table(diet_table)
+    story.append(diet_table_obj)
+
 
 
     # SUPPLEMENTS
-    story.append(paragraph("Supplements (Optional)", styles["Heading2"]))
+    story.append(Paragraph("Supplements (Optional)", styles["Heading2"]))
     story.append(Spacer(1,10))
 
     for s in supplements:
-        story.append(paragraph(f"• {s}", styles["Normal"]))
+        story.append(Paragraph(f"• {s}", styles["Normal"]))
 
     story.append(Spacer(1,20))
 
 
     # HEALTH TIPS
-    story.append(paragraph("Practical Health Tips", styles["Heading2"]))
+    story.append(Paragraph("Practical Health Tips", styles["Heading2"]))
     story.append(Spacer(1,10))
 
     for t in tips:
-        story.append(paragraph(f"• {t}", styles["Normal"]))
+        story.append(Paragraph(f"• {t}", styles["Normal"]))
 
 
     doc.build(story)

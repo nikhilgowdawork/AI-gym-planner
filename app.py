@@ -214,7 +214,7 @@ if st.session_state["page"] == 4:
      # Display the plan if generated
      if st.session_state["your_personalized_plan"] :
           st.divider()
-          plan = st.session_state["your_personlized_plan"]
+          plan = st.session_state["your_personalized_plan"]
 
           intro = plan["introduction"]
           exercise_data = plan["exercise_plan"]
@@ -226,7 +226,7 @@ if st.session_state["page"] == 4:
           st.write(intro)
 
           st.subheader("7-Days Exercise Plan")
-          exercise_df = pd.dataframe(exercise_data)
+          exercise_df = pd.DataFrame(exercise_data)
           st.table(exercise_df)
 
           st.subheader("7-Day Diet Plan")
