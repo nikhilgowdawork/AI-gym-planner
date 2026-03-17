@@ -3,7 +3,8 @@ from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Table
 from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
 from reportlab.lib.units import inch
-import streamlit as st
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib import colors
 
 
 def create_pdf(exercise_data, diet_data, supplements, tips):
@@ -25,24 +26,50 @@ def create_pdf(exercise_data, diet_data, supplements, tips):
     story.append(Paragraph("7-Day Exercise Plan", styles["Heading2"]))
     story.append(Spacer(1,10))
 
-    exercise_table = [["Day","Exercise","Sets","Reps","Rest"]]
+    exercise_table = [["Day","Exercise","Sets'n'reps","Rest"]]
 
     for row in exercise_data:
         exercise_table.append([
         row["day"],
         row["exercise"],
-        row["sets"],
-        row["reps"],
+        row["sets'n'reps"],
         row["rest"]
     ])
 
-    table = Table(exercise_table)
+    table = Table(
+        exercise_table,colWidths=[60,170,90,130]
+
+    )
+
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.darkblue),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.white),
+        ("GRID", (0,0), (-1,-1), 0.5, colors.grey),
+        ("VALIGN", (0,0), (-1,-1), "TOP"),
+        ("LEFTPADDING", (0,0), (-1,-1), 6),
+        ("RIGHTPADDING", (0,0), (-1,-1), 6),
+        ("TOPPADDING", (0,0), (-1,-1), 6),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
+
+    ])) 
     story.append(table)
 
 
     # DIET TABLE
     story.append(Paragraph("7-Day Diet Plan", styles["Heading2"]))
-    
+    story.append(Spacer(1,10))
+
+    def format_meal(text,styles):
+        parts = text.split("(")
+        main = parts[0]
+        extra = "(" + parts[1] if len(parts) > 1 else ""
+
+        bullet_text = f"""
+        • {main.strip()} <br/>
+        <font size = 8>{extra.strip()}</font>
+        """
+        return Paragraph(bullet_text, styles["Normal"])
+
 
     diet_table = [
     ["Day", "Breakfast", "Lunch", "Dinner", "Snacks", "Calories", "Protein"]
@@ -50,18 +77,39 @@ def create_pdf(exercise_data, diet_data, supplements, tips):
 
     for row in diet_data:
         diet_table.append([
-        row["day"],
-        row["breakfast"],
-        row["lunch"],
-        row["dinner"],
-        row["snacks"],
-        row["calories"],
-        row["protein"]
+        format_meal(row["day"],styles),
+        format_meal(row["breakfast"],styles),
+        format_meal(row["lunch"],styles),
+        format_meal(row["dinner"],styles),
+        format_meal(row["snacks"],styles),
+        format_meal(row["calories"],styles),
+        format_meal(row["protein"],styles)
     ])
 
-    diet_table_obj = Table(diet_table)
-    story.append(diet_table_obj)
+    diet_table_obj = Table(
+    diet_table,
+    colWidths=[40,110,110,110,100,50,50]  # column sizes
+)
 
+    diet_table_obj.setStyle(TableStyle([
+        ("BACKGROUND",(0,0),(-1,0),colors.darkgreen),
+    ("TEXTCOLOR",(0,0),(-1,0),colors.white),
+
+    ("GRID",(0,0),(-1,-1),0.5,colors.grey),
+
+    ("VALIGN",(0,0),(-1,-1),"TOP"),
+
+    ("LEFTPADDING",(0,0),(-1,-1),6),
+    ("RIGHTPADDING",(0,0),(-1,-1),6),
+    ("TOPPADDING",(0,0),(-1,-1),6),
+    ("BOTTOMPADDING",(0,0),(-1,-1),6)
+    ]))
+
+    story.append(diet_table_obj)
+    story.append(Spacer(1,20))
+    
+
+    
 
 
     # SUPPLEMENTS

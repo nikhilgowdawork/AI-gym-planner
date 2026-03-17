@@ -104,8 +104,7 @@ Use this exact JSON structure:
 {{
 "day": "",
 "exercise": "",
-"sets": "",
-"reps": "",
+"sets'n'reps": "",
 "rest": ""
 }}
 ],
