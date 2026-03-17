@@ -26,14 +26,15 @@ def create_pdf(exercise_data, diet_data, supplements, tips):
     story.append(Paragraph("7-Day Exercise Plan", styles["Heading2"]))
     story.append(Spacer(1,10))
 
-    exercise_table = [["Day","Exercise","Sets'n'reps","Rest"]]
+    exercise_table = [["Day","Exercise","Sets and reps","Rest"]]
 
     for row in exercise_data:
         exercise_table.append([
+
         row["day"],
-        row["exercise"],
-        row["sets'n'reps"],
-        row["rest"]
+        Paragraph(row["exercise"], styles["Normal"]),
+        Paragraph(row["sets and reps"], styles["Normal"]),
+        Paragraph(row["rest"], styles["Normal"])
     ])
 
     table = Table(
@@ -77,18 +78,18 @@ def create_pdf(exercise_data, diet_data, supplements, tips):
 
     for row in diet_data:
         diet_table.append([
-        format_meal(row["day"],styles),
+        row["day"],
         format_meal(row["breakfast"],styles),
         format_meal(row["lunch"],styles),
         format_meal(row["dinner"],styles),
         format_meal(row["snacks"],styles),
-        format_meal(row["calories"],styles),
-        format_meal(row["protein"],styles)
+        row["calories"],
+        row["protein"],
     ])
 
     diet_table_obj = Table(
     diet_table,
-    colWidths=[40,110,110,110,100,50,50]  # column sizes
+    colWidths=[60,110,110,110,100,50,50]  # column sizes
 )
 
     diet_table_obj.setStyle(TableStyle([
